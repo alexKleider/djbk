@@ -6,7 +6,10 @@
 A double entry book keeping system.
 
 A user wants to use the system.
-She checks out the url and receives an invitation to begin.
+She checks out the url and sees that its title contains
+"Double Entry Book Keeping" ...
+^^^^^^ tested vs STILL TO TEST ...vvvv
+She is prompted to enter her user name ...
 She's never used the system before so:
 She must set herself up with user name and password ...
 And then create one or more Entities.
@@ -28,8 +31,24 @@ Options:
 
 from selenium import webdriver
 
-browser = webdriver.Chrome()
-browser.get('http://localhost:8000')
+import unittest
 
-assert 'Django' in browser.title
+class NewVisitorTest(unittest.TestCase):
 
+    def setUp(self):
+        self.browser = webdriver.Chrome()
+        self.browser.implicitly_wait(3)
+
+    def tearDown(self):
+        self.browser.quit()
+
+    def test_user_gets_to_opening_page(self):
+        self.browser.get('http://localhost:8000')
+#       self.assertIn("Django", self.browser.title)
+        self.assertIn("Double Entry Book Keeping", self.browser.title)
+
+    def test_all_finished(self):
+        self.fail("Finish tests!")
+
+if __name__ == "__main__":
+    unittest.main(warnings='ignore')
