@@ -1,4 +1,1 @@
-sqlite.db
-*.pyc
-__pycache__
-.*.swp
+db.sqlite3
