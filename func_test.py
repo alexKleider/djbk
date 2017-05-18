@@ -1,7 +1,9 @@
 #!../venv/bin/python
 
-# File: func_test.py
+# File: func_test.py    (..in ~/Py/Djbk/debk)
 
+# Depends on the dev server running.
+# Functional Test==Acceptance Test==End-To-End Test==Black Box Test.
 """
 A double entry book keeping system.
 
