@@ -2,6 +2,9 @@
 
 # File: func_test.py    (..in ~/Py/Djbk/debk)
 
+# DON'T USE THIS FILE-
+# USE INSTEAD f_tests/test.py
+
 # Depends on the dev server running.
 # Functional Test==Acceptance Test==End-To-End Test==Black Box Test.
 """
@@ -10,8 +13,8 @@ A double entry book keeping system.
 A user wants to use the system.
 She checks out the url and sees that its title contains
 "Double Entry Book Keeping" ...
-^^^^^^ tested vs STILL TO TEST ...vvvv
 She is prompted to enter her user name ...
+^^^^^^ tested vs STILL TO TEST ...vvvv
 She's never used the system before so:
 She must set herself up with user name and password ...
 And then create one or more Entities.
@@ -35,7 +38,7 @@ from selenium import webdriver
 
 import unittest
 
-class NewVisitorTest(unittest.TestCase):
+class NewAccountTest(unittest.TestCase):
 
     def setUp(self):
         self.browser = webdriver.Chrome()
@@ -48,6 +51,16 @@ class NewVisitorTest(unittest.TestCase):
         self.browser.get('http://localhost:8000')
 #       self.assertIn("Django", self.browser.title)
         self.assertIn("Double Entry Book Keeping", self.browser.title)
+
+    def test_user_choose_from_a_menu_to_create_an_entity(self):
+        """
+        She is presented with a menu with a choice to create an
+        entity...:
+        """
+        inputbox = self.browser.find_element_by_id('id_user_id')
+        self.assertEqual(inputbox.get_attribute('place_holder'),
+            'Enter your user ID')
+        inputbox
 
     def test_all_finished(self):
         self.fail("Finish tests!")
