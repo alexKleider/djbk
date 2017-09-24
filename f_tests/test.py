@@ -1,11 +1,18 @@
 #!../venv/bin/python
 
+FILE_NAME = "f_tests/test.py"
+
+# The tests get run using ./manage.py test
+# or ./manage.py test f_tests/test.py (if only want this one.)
+
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 
 # User points browser to debk app, finds the site's home page
 # which claims to provide 'Double Entry Book Keeping' infrastructure.
+
+print('running {}'.format(FILE_NAME))
 
 class FirstVisitTest(LiveServerTestCase):
     
@@ -15,15 +22,24 @@ class FirstVisitTest(LiveServerTestCase):
 
     def tearDown(self):
         self.browser.quit()
+    
+#   def test_check_tests_are_running(self):
+#       self.assertTrue(2 + 2 == 5)
 
-    def check_django_is_running(self):
-        content = self.browser.content()
-        self.assertIn('Django', content)
+    def test_check_django_serving_our_site(self):
+        self.browser.get('http://localhost:8000')
+        title = self.browser.title
+        self.assertIn('Double Entry Book Keeping', title)
+        print("Expect the 'Finish the (functional) tests' error.")
+        self.fail("Finish the tests.")
+#       main_heading = (
+#           self.browser.find_element_by_id(
+#               'id_select_or_create').content())
+#       self.assertIn("SELECT or CREATE", main_heading)
 
 # The home page provides a menu, one choice of which is to
 # 0. Create a new accounting entity.
-# Other choices are:
-# 1. Work on an existing entity.
+# Other choices are a listing of already created entities.
 
 # She chooses to create a new entity and is presented with a
 # new entity creation page containing a form
@@ -63,3 +79,32 @@ class FirstVisitTest(LiveServerTestCase):
 #      b. journal
 #    4. Adjustments
 #      a. ....
+
+# Depends on the dev server running.
+# Functional Test==Acceptance Test==End-To-End Test==Black Box Test.
+"""
+A double entry book keeping system.
+
+A user wants to use the system.
+She checks out the url and sees that its title contains
+"Double Entry Book Keeping" ...
+She is prompted to enter her user name ...
+^^^^^^ tested vs STILL TO TEST ...vvvv
+She's never used the system before so:
+She must set herself up with user name and password ...
+And then create one or more Entities.
+She can then choose to do book keeping for one of her entities.
+Options:
+1.  There will be an option to set up accounts, either one at a time
+    or by selecting a text file (which will be accepted if formatted
+    correctly and containing no conflicts.)
+2.  Another option will be to make journal entries:
+        each must have a date (set to currend date by default,)
+        some descriptive text and
+        at a minimum two line entries each containing
+            an account number, a currency amount, and Dr or Cr.
+        The amounts must balance out to 0.
+3.  Examine records (journal &/or accounts) with option to print.
+4.  End of fiscal period close out
+
+"""
