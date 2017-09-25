@@ -31,6 +31,7 @@ class FirstVisitTest(LiveServerTestCase):
         self.browser.quit()
     
 #   def test_check_tests_are_running(self):
+        """ a 'smoke test' to check that tests are being run """
 #       self.assertTrue(2 + 2 == 5)
 
     def test_data_dir_exists(self):
@@ -40,17 +41,30 @@ class FirstVisitTest(LiveServerTestCase):
         self.browser.get('http://localhost:8000')
         title = self.browser.title
         self.assertIn('Double Entry Book Keeping', title)
-        print("Expect the 'Finish the (functional) tests' error.")
-        self.fail("Finish the tests.")
-#       main_heading = (
-#           self.browser.find_element_by_id(
-#               'id_select_or_create').content())
-#       self.assertIn("SELECT or CREATE", main_heading)
+        main_heading = (
+            self.browser.find_element_by_tag_name(
+                'h1').text)
+        self.assertIn("SELECT or CREATE", main_heading)
 
 # The home page provides a menu, one choice of which is to
 # 0. Create a new accounting entity.
-# Other choices are a listing of already created entities.
+# so our user does just that:
+        inbox = self.browser.find_element_by_id("id_new_entity")
+        self.assertEqual(inbox.get_attribute('place_holder'),
+            'Pick a name for your entity.')
+# ..picks a name for a new entity:
+        inbox.send_keys("FirstEntity")
+        inbox.send_keys(Keys.ENTER)
+# .. upon hitting enter, the 'FirstEntity' appears on the listing
+# of already created entities.
+        table = self.browser.find_element_by_id(
+            "id_list_of_entities")
+        rows = self.browser.find_elements_by_tag_name('tr')
+        self.assertTrue(any(
+            row.text == "FirstEntity" for row in rows))
 
+        print("Expect the 'Finish the (functional) tests' error.")
+        self.fail("Finish the tests.")
 # She chooses to create a new entity and is presented with a
 # new entity creation page containing a form
 # into which she is asked to enter:
