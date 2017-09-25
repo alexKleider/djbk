@@ -14,17 +14,27 @@ from selenium.webdriver.common.keys import Keys
 
 print('running {}'.format(FILE_NAME))
 
+TEST_DATA_DIRECTORY = 'data/test-data'
+
+import os
+import shutil
+
 class FirstVisitTest(LiveServerTestCase):
     
     def setUp(self):
+        os.makedirs(TEST_DATA_DIRECTORY)
         self.browser = webdriver.Chrome()
         # self.browser.implicitly_wait(3)
 
     def tearDown(self):
+        shutil.rmtree(TEST_DATA_DIRECTORY)
         self.browser.quit()
     
 #   def test_check_tests_are_running(self):
 #       self.assertTrue(2 + 2 == 5)
+
+    def test_data_dir_exists(self):
+        os.path.isdir(TEST_DATA_DIRECTORY)
 
     def test_check_django_serving_our_site(self):
         self.browser.get('http://localhost:8000')
