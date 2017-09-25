@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 
-from register.views import home_page
+from books.views import home_page
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
