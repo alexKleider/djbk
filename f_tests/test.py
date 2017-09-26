@@ -51,7 +51,7 @@ class FirstVisitTest(LiveServerTestCase):
 # so our user does just that:
         inbox = self.browser.find_element_by_id("id_new_entity")
         self.assertEqual(inbox.get_attribute('place_holder'),
-            'Pick a name for your entity.')
+            'Pick a name for your new entity.')
 # ..picks a name for a new entity:
         inbox.send_keys("FirstEntity")
         inbox.send_keys(Keys.ENTER)
@@ -61,9 +61,10 @@ class FirstVisitTest(LiveServerTestCase):
             "id_list_of_entities")
         rows = self.browser.find_elements_by_tag_name('tr')
         self.assertTrue(any(
-            row.text == "FirstEntity" for row in rows))
+            row.text == "FirstEntity" for row in rows),
+            "New 'FirstEntity' did not appear in list.")
 
-        print("Expect the 'Finish the (functional) tests' error.")
+#       print("Expect the 'Finish the (functional) tests' error.")
         self.fail("Finish the tests.")
 # She chooses to create a new entity and is presented with a
 # new entity creation page containing a form
