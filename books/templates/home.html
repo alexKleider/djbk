@@ -22,10 +22,15 @@
     any combination of alphaneumeric characters and the
     underscore character, nothing else will be accepted.</p>
 
-    <input id="id_new_entity"
-        place_holder="Pick a name for your new entity." />
+    <form method="POST">
+        <input name="new_entity"
+            id="id_new_entity"
+            place_holder="Pick a name for your new entity." />
+        {% csrf_token %}
+    </form>
 
     <table id="id_list_of_entities">
+        <tr><td> {{ new_entity_text }} </td></tr>
     </table>
 
 </body>
