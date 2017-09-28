@@ -57,6 +57,8 @@ class FirstVisitTest(LiveServerTestCase):
         inbox.send_keys(Keys.ENTER)
 # .. upon hitting enter, the 'FirstEntity' appears on the listing
 # of already created entities.
+#       import time
+#       time.sleep(10)
         table = self.browser.find_element_by_id(
             "id_list_of_entities")
         rows = self.browser.find_elements_by_tag_name('tr')
