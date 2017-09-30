@@ -42,7 +42,6 @@ class HomePageTest(TestCase):
         self.assertEqual(found.func, home_page)
 
     def test_home_page_returns_correct_html(self):
-
         request = HttpRequest()
         response = home_page(request)
         returned_html = response.content.decode()
@@ -53,7 +52,6 @@ class HomePageTest(TestCase):
 
     def test_home_page_can_save_a_post_request(self):
         entity = "FirstEntity"
-
         request = HttpRequest()
         request.method = "POST"
         request.POST["new_entity"] = entity
@@ -71,4 +69,30 @@ class HomePageTest(TestCase):
         self.assertFalse(
             n_differing_lines(content, expected_html) > 1,
             "content and expected html differ by more than the 1 line")
+
+        returned_html = response.content.decode()
+        rendered_html = render_to_string('home.html') 
+        self.assertFalse(
+            n_differing_lines(returned_html ,rendered_html) > 1,
+            "returned and rendered differ by > 1 line")
+
+    def test_home_page_can_save_a_post_request(self):
+        new_item = "FirstEntity"
+
+        request = HttpRequest()
+        request.method = "POST"
+        request.POST["new_entity"] = new_item
+
+        response = home_page(request)
+        content = response.content.decode()
+        self.assertIn(new_item, content)
+        # v- putting input into the correct place.
+        expected_html = render_to_string('home.html',
+            {'new_entity_text': new_item})
+
+#       print('\n', content, '\n')
+        self.assertFalse(
+            n_differing_lines(content ,expected_html) > 1,
+            "Content and expected differ by > 1 line."
+            )
 

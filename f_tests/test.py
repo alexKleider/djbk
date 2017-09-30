@@ -59,6 +59,7 @@ class FirstVisitTest(LiveServerTestCase):
 # of already created entities.
 #       import time
 #       time.sleep(10)
+
         ## NOT SURE why the next line- not being used!
         table = self.browser.find_element_by_id(
             "id_list_of_entities")
