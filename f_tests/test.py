@@ -30,7 +30,7 @@ class FirstVisitTest(LiveServerTestCase):
         shutil.rmtree(TEST_DATA_DIRECTORY)
         self.browser.quit()
     
-#   def test_check_tests_are_running(self):
+#   def test_to_check_tests_are_running(self):
         """ a 'smoke test' to check that tests are being run """
 #       self.assertTrue(2 + 2 == 5)
 
@@ -59,12 +59,11 @@ class FirstVisitTest(LiveServerTestCase):
 # of already created entities.
 #       import time
 #       time.sleep(10)
+        ## NOT SURE why the next line- not being used!
         table = self.browser.find_element_by_id(
             "id_list_of_entities")
         rows = self.browser.find_elements_by_tag_name('tr')
-        self.assertTrue(any(
-            row.text == "FirstEntity" for row in rows),
-            "New 'FirstEntity' did not appear in list.")
+        self.assertIn("1. FirstEntity", [row.text for row in rows])
 
 #       print("Expect the 'Finish the (functional) tests' error.")
         self.fail("Finish the tests.")
