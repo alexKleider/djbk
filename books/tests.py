@@ -46,6 +46,8 @@ class HomePageTest(TestCase):
         response = home_page(request)
         returned_html = response.content.decode()
         rendered_html = render_to_string('home.html') 
+        send2file(returned_html, "returned_html.txt")
+        send2file(rendered_html, "rendered_html.txt")
         self.assertFalse(
             n_differing_lines(returned_html ,rendered_html) > 1,
             "returned_html and rendered_html differ by more than the 1 line")

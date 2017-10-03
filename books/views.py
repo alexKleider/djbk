@@ -16,6 +16,8 @@ def home_page(request):
         if not entity_created(new_entity):
             announce_failure(new_entity)
             new_entity = ''
+#   else:
+#       new_entity = "entity place holder"
     return render(request, "home.html", {
         "new_entity_text": new_entity,
         })

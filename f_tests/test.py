@@ -15,6 +15,7 @@ from selenium.webdriver.common.keys import Keys
 print('running {}'.format(FILE_NAME))
 
 TEST_DATA_DIRECTORY = 'data/test-data'
+# Assume dir 'data' already exists but 'test-data' does not.
 
 import os
 import shutil
@@ -31,7 +32,7 @@ class FirstVisitTest(LiveServerTestCase):
         self.browser.quit()
     
 #   def test_to_check_tests_are_running(self):
-        """ a 'smoke test' to check that tests are being run """
+#       """ a 'smoke test' to check that tests are being run """
 #       self.assertTrue(2 + 2 == 5)
 
     def test_data_dir_exists(self):
@@ -65,6 +66,27 @@ class FirstVisitTest(LiveServerTestCase):
             "id_list_of_entities")
         rows = self.browser.find_elements_by_tag_name('tr')
         self.assertIn("1. FirstEntity", [row.text for row in rows])
+
+# Let's see if she can create more than one entity:
+        inbox = self.browser.find_element_by_id("id_new_entity")
+        self.assertEqual(inbox.get_attribute('place_holder'),
+            'Pick a name for your new entity.')
+# ..picks a name for a second entity:
+        inbox.send_keys("SecondEntity")
+        inbox.send_keys(Keys.ENTER)
+# .. upon hitting enter, the 'SecondEntity' appears on the listing
+# of already created entities.
+#       import time
+#       time.sleep(10)
+
+        ## NOT SURE why the next line- not being used!
+        table = self.browser.find_element_by_id(
+            "id_list_of_entities")
+        rows = self.browser.find_elements_by_tag_name('tr')
+        self.assertIn("1. FirstEntity", [row.text for row in rows])
+        self.assertIn("2. SecondEntity", [row.text for row in rows])
+
+# 
 
 #       print("Expect the 'Finish the (functional) tests' error.")
         self.fail("Finish the tests.")
