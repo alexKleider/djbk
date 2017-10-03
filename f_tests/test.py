@@ -30,7 +30,13 @@ class FirstVisitTest(LiveServerTestCase):
     def tearDown(self):
         shutil.rmtree(TEST_DATA_DIRECTORY)
         self.browser.quit()
-    
+
+    def check_for_row_in_list_of_entities(self, row_text):
+        table = self.browser.find_element_by_id(
+            "id_list_of_entities")
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
 #   def test_to_check_tests_are_running(self):
 #       """ a 'smoke test' to check that tests are being run """
 #       self.assertTrue(2 + 2 == 5)
@@ -61,11 +67,7 @@ class FirstVisitTest(LiveServerTestCase):
 #       import time
 #       time.sleep(10)
 
-        ## NOT SURE why the next line- not being used!
-        table = self.browser.find_element_by_id(
-            "id_list_of_entities")
-        rows = self.browser.find_elements_by_tag_name('tr')
-        self.assertIn("1. FirstEntity", [row.text for row in rows])
+        self.check_for_row_in_list_of_entities("1. FirstEntity")
 
 # Let's see if she can create more than one entity:
         inbox = self.browser.find_element_by_id("id_new_entity")
@@ -79,12 +81,8 @@ class FirstVisitTest(LiveServerTestCase):
 #       import time
 #       time.sleep(10)
 
-        ## NOT SURE why the next line- not being used!
-        table = self.browser.find_element_by_id(
-            "id_list_of_entities")
-        rows = self.browser.find_elements_by_tag_name('tr')
-        self.assertIn("1. FirstEntity", [row.text for row in rows])
-        self.assertIn("2. SecondEntity", [row.text for row in rows])
+        self.check_for_row_in_list_of_entities("1. FirstEntity")
+        self.check_for_row_in_list_of_entities("2. SecondEntity")
 
 # 
 
