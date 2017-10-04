@@ -31,9 +31,16 @@ def n_differing_lines(s1, s2):
             n_differing_lines += 1
     return n_differing_lines
 
-def send2file(text, file_name):
-    with open(file_name, 'w') as outfile:
-        outfile.write(text)
+def send2files(returned_txt, rendered_txt, n='', 
+            returned_pattern = "returned{}.txt",
+            rendered_pattern = "rendered{}.txt"):
+    returned_file_name = returned_pattern.format(n)
+    rendered_file_name = rendered_pattern.format(n)
+    with open(returned_file_name, 'w') as outfile:
+        outfile.write(returned_txt)
+    with open(rendered_file_name, 'w') as outfile:
+        outfile.write(rendered_txt)
+    return "{} and {}".format(returned_file_name, rendered_file_name)
 
 class HomePageTest(TestCase):
 
@@ -42,43 +49,53 @@ class HomePageTest(TestCase):
         self.assertEqual(found.func, home_page)
 
     def test_home_page_returns_correct_html(self):
+        """
+        creates returned1.txt and rendered1.txt
+        """
         request = HttpRequest()
         response = home_page(request)
         returned_html = response.content.decode()
         rendered_html = render_to_string('home.html') 
-        send2file(returned_html, "returned_html.txt")
-        send2file(rendered_html, "rendered_html.txt")
+        msg = send2files(returned_html, rendered_html, n=1)
         self.assertFalse(
             n_differing_lines(returned_html ,rendered_html) > 1,
-            "returned_html and rendered_html differ by more than the 1 line")
+            msg + " differ by more than the 1 line")
 
     def test_home_page_can_save_a_post_request(self):
+        """
+        creates returned2.txt and rendered2.txt
+        and     returned3.txt and rendered3.txt
+        """
         entity = "FirstEntity"
         request = HttpRequest()
         request.method = "POST"
         request.POST["new_entity"] = entity
 
         response = home_page(request)
-        content = response.content.decode()
-        self.assertIn(entity, content)
-        # v- putting input into the correct place.
+
         expected_html = render_to_string('home.html',
             {'new_entity_text': entity})
+        content = response.content.decode()
 
-#       print('\n', content, '\n')
-        send2file(content, 'content.txt')
-        send2file(expected_html, 'expected.txt')
+        self.assertIn(entity, content)
+
+        msg = send2files(content, expected_html, n=2)
         self.assertFalse(
             n_differing_lines(content, expected_html) > 1,
-            "content and expected html differ by more than the 1 line")
+            msg + " differ by more than the 1 line")
 
-        returned_html = response.content.decode()
         rendered_html = render_to_string('home.html') 
+        returned_html = response.content.decode()
+
+        msg = send2files(returned_html, rendered_html, n=3)
         self.assertFalse(
             n_differing_lines(returned_html ,rendered_html) > 1,
-            "returned and rendered differ by > 1 line")
+            msg + " differ by > 1 line")
 
     def test_home_page_can_save_a_post_request(self):
+        """
+        creates returned4.txt and rendered4.txt
+        """
         new_item = "FirstEntity"
 
         request = HttpRequest()
@@ -87,14 +104,15 @@ class HomePageTest(TestCase):
 
         response = home_page(request)
         content = response.content.decode()
+
         self.assertIn(new_item, content)
+
         # v- putting input into the correct place.
         expected_html = render_to_string('home.html',
             {'new_entity_text': new_item})
 
-#       print('\n', content, '\n')
+        msg = send2files(content, expected_html, n=4)
         self.assertFalse(
             n_differing_lines(content ,expected_html) > 1,
-            "Content and expected differ by > 1 line."
-            )
+            msg + " differ by > 1 line.")
 
