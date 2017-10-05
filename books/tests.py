@@ -25,11 +25,11 @@ def n_differing_lines(s1, s2):
     Fails only if more than one line differs.
     """
     zipped = zip(s1.split("\n"), s2.split("\n"))
-    n_differing_lines = 0
+    n = 0
     for l1, l2 in zipped:
         if l1 != l2:
-            n_differing_lines += 1
-    return n_differing_lines
+            n += 1
+    return n
 
 def send2files(returned_txt, rendered_txt, n='', 
             returned_pattern = "returned{}.txt",
@@ -41,6 +41,14 @@ def send2files(returned_txt, rendered_txt, n='',
     with open(rendered_file_name, 'w') as outfile:
         outfile.write(rendered_txt)
     return "{} and {}".format(returned_file_name, rendered_file_name)
+
+def get_decoded_content_of_response_to_a_POST(
+                            view_func, key, submission):
+    request = HttpRequest()
+    request.method = "POST"
+    request.POST[key] = submission
+    response = view_func(request)
+    return response.content.decode()
 
 class HomePageTest(TestCase):
 
@@ -98,16 +106,10 @@ class HomePageTest(TestCase):
         """
         new_item = "FirstEntity"
 
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST["new_entity"] = new_item
-
-        response = home_page(request)
-        content = response.content.decode()
-
+        content = get_decoded_content_of_response_to_a_POST(
+            home_page, "new_entity", new_item)
         self.assertIn(new_item, content)
 
-        # v- putting input into the correct place.
         expected_html = render_to_string('home.html',
             {'new_entity_text': new_item})
 
@@ -115,4 +117,20 @@ class HomePageTest(TestCase):
         self.assertFalse(
             n_differing_lines(content ,expected_html) > 1,
             msg + " differ by > 1 line.")
+
+delete4now = """
+    def test_list_persistence(self):
+        entity1 = "FirstEntity"
+        entity2 = "SecondEntity"
+        entity3 = "ThirdEntity"
+        content = get_decoded_content_of_response_to_a_POST(
+            home_page, "new_entity", entity1)
+        content = get_decoded_content_of_response_to_a_POST(
+            home_page, "new_entity", entity2)
+        content = get_decoded_content_of_response_to_a_POST(
+            home_page, "new_entity", entity3)
+        self.assertIn("1. {}".format(entity1), content)
+        self.assertIn("2. {}".format(entity2), content)
+        self.assertIn("3. {}".format(entity3), content)
+"""
 
