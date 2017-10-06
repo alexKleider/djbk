@@ -5,15 +5,9 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 from books.views import home_page
 
-import os
-import shutil
-
 from books.src.config import DEFAULTS as D
 import books.src.entities as ents
-
-cwd = os.getcwd()
-temp_dir_name = os.path.join(cwd, "data.d")
-original_dir_name = D["home"]
+from setup_d.utilities import save_local_data, restore_local_data
 
 # Create your tests here.
 
@@ -85,15 +79,12 @@ class HomePageTest(TestCase):
         and     returned3.txt and rendered3.txt
         """
         entity = "FirstEntity"
-        request = HttpRequest()
-        request.method = "POST"
-        request.POST["new_entity"] = entity
-
-        response = home_page(request)
+        
+        content = get_decoded_content_of_response_to_a_POST(
+            home_page, "new_entity", entity)
 
         expected_html = render_to_string('home.html',
             {'new_entity_text': entity})
-        content = response.content.decode()
 
         self.assertIn(entity, content)
 
@@ -103,7 +94,7 @@ class HomePageTest(TestCase):
             msg + " differ by more than the 1 line")
 
         rendered_html = render_to_string('home.html') 
-        returned_html = response.content.decode()
+        returned_html = content
 
         msg = send2files(returned_html, rendered_html, n=3)
         self.assertFalse(
@@ -131,18 +122,10 @@ class HomePageTest(TestCase):
 class PersistenceTest(TestCase):
 
     def setUp(self):
-        os.rename(original_dir_name, temp_dir_name)
-        os.mkdir(original_dir_name)
-        file_name = os.path.join(original_dir_name, D['last_entity'])
-        with open(file_name, 'w') as f_obj:
-            f_obj.write('')
-        shutil.copy(
-            os.path.join(temp_dir_name, D['cofa_template']),
-            D['home'])
+        save_local_data()
 
     def tearDown(self):
-        shutil.rmtree(original_dir_name)
-        os.rename(temp_dir_name, original_dir_name)
+        restore_local_data()
 
     def test_entity_persistence(self):
         entities, default = ents.get_file_info(D)

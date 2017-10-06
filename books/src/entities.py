@@ -44,8 +44,11 @@ def get_file_info(defaults):
             default_entity = f_object.read()
     except OSError:
         default_entity = ''
+        with open(default_file, 'w') as f_object:
+            f_object.write(default_entity)
         logging.warning(
-    "Expected file (%s) could not be found by 'get_file_info()'." % default_file)
+    """Expected file (%s) could not be found by 'get_file_info()'-
+    ... an empty file has been created.""" % default_file)
     if default_entity in lst:
         default = default_entity
     else:

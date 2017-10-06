@@ -9,35 +9,24 @@ from selenium.webdriver.common.keys import Keys
 
 from books.src.config import DEFAULTS as D
 
+from setup_d.utilities import save_local_data, restore_local_data
+
 import os
-import shutil
 
 # User points browser to debk app, finds the site's home page
 # which claims to provide 'Double Entry Book Keeping' infrastructure.
 
 print('running {}'.format(FILE_NAME))
 
-cwd = os.getcwd()
-temp_dir_name = os.path.join(cwd, "data.d")
-original_dir_name = D["home"]
-
 class FirstVisitTest(LiveServerTestCase):
     
     def setUp(self):
-        os.rename(original_dir_name, temp_dir_name)
-        os.mkdir(original_dir_name)
-        file_name = os.path.join(original_dir_name, D['last_entity'])
-        with open(file_name, 'w') as f_obj:
-            f_obj.write('')
-        shutil.copy(
-            os.path.join(temp_dir_name, D['cofa_template']),
-            D['home'])
+        save_local_data()
         self.browser = webdriver.Chrome()
         # self.browser.implicitly_wait(3)
 
     def tearDown(self):
-        shutil.rmtree(original_dir_name)
-        os.rename(temp_dir_name, original_dir_name)
+        restore_local_data()
         self.browser.quit()
 
     def check_for_row_in_list_of_entities(self, row_text):

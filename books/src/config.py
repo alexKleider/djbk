@@ -149,12 +149,17 @@ N_ASSET_OWNERS = 8   # Specific to Kazan15
                      # Must jive with 'split' values in CofAs.
                      # Will try to move this out of here and into a
                      # special use module.
+CWD = os.getcwd()
+    # os.getcwd() returns '/home/alex/Py/DjBk/debk'
 
 DEFAULTS = dict(        # DEFAULTS, often imported "as D".  ####
-    # os.getcwd() returns '/home/alex/Py/DjBk/debk'
-    home=os.path.join(os.getcwd(), 'data'), # home of data files
+    home=os.path.join(CWD, 'data'), # home of data files
     # If changing the above, be sure permissions are set properly.
-    # DEFAULTS["home"] is reset to 'data4testing' for tests.
+    temp_home=os.path.join(CWD, 'data.temp'),
+    # Used to temporarity contain local data files during testing."
+    virgin_home=os.path.join(CWD, 'setup_d', "data.d"),
+    # Used as a source to re-establish a virgin data directory.
+    # The script restore_virgin_data.py can be used for this.
     cofa_template="defaultChartOfAccounts",     # A file name.
     # A file by this name and consisting of a default chart of
     # accounts is expected to be in the "home" directory to be
