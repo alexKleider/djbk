@@ -5,6 +5,16 @@ from django.http import HttpRequest
 from django.template.loader import render_to_string
 from books.views import home_page
 
+import os
+import shutil
+
+from books.src.config import DEFAULTS as D
+import books.src.entities as ents
+
+cwd = os.getcwd()
+temp_dir_name = os.path.join(cwd, "data.d")
+original_dir_name = D["home"]
+
 # Create your tests here.
 
 unnecessary = """
@@ -118,8 +128,49 @@ class HomePageTest(TestCase):
             n_differing_lines(content ,expected_html) > 1,
             msg + " differ by > 1 line.")
 
-delete4now = """
-    def test_list_persistence(self):
+class PersistenceTest(TestCase):
+
+    def setUp(self):
+        os.rename(original_dir_name, temp_dir_name)
+        os.mkdir(original_dir_name)
+        file_name = os.path.join(original_dir_name, D['last_entity'])
+        with open(file_name, 'w') as f_obj:
+            f_obj.write('')
+        shutil.copy(
+            os.path.join(temp_dir_name, D['cofa_template']),
+            D['home'])
+
+    def tearDown(self):
+        shutil.rmtree(original_dir_name)
+        os.rename(temp_dir_name, original_dir_name)
+
+    def test_entity_persistence(self):
+        entities, default = ents.get_file_info(D)
+        self.assertTrue(len(entities) == 0)
+        self.assertTrue(len(default) == 0)
+        entity1 = "FirstEntity"
+        ents.create_entity(entity1, D)
+        entities, default = ents.get_file_info(D)
+        self.assertTrue(len(entities) == 1)
+        self.assertIn('FirstEntity', entities)
+
+        entity2 = "SecondEntity"
+        ents.create_entity(entity2, D)
+        entities, default = ents.get_file_info(D)
+        self.assertTrue(len(entities) == 2)
+        self.assertIn('FirstEntity', entities)
+        self.assertIn('SecondEntity', entities)
+
+        entity3 = "ThirdEntity"
+        ents.create_entity(entity3, D)
+        entities, default = ents.get_file_info(D)
+        self.assertTrue(len(entities) == 3)
+        self.assertIn('FirstEntity', entities)
+        self.assertIn('SecondEntity', entities)
+        self.assertIn('ThirdEntity', entities)
+
+
+    def test_entities_are_displayed(self):
         entity1 = "FirstEntity"
         entity2 = "SecondEntity"
         entity3 = "ThirdEntity"
@@ -132,5 +183,5 @@ delete4now = """
         self.assertIn("1. {}".format(entity1), content)
         self.assertIn("2. {}".format(entity2), content)
         self.assertIn("3. {}".format(entity3), content)
-"""
+
 

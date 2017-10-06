@@ -1,1 +1,8 @@
 db.sqlite3
+__pycache__
+*.pyc
+.*.swp
+data/*
+!data/defaultChartOfAccounts
+!data/defaultEntity
+

@@ -1,34 +1,43 @@
-#!../venv/bin/python
-
 FILE_NAME = "f_tests/test.py"
 
 # The tests get run using ./manage.py test
-# or ./manage.py test f_tests/test.py (if only want this one.)
+# or ./manage.py test f_tests (if only want tests this directory.)
 
 from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+
+from books.src.config import DEFAULTS as D
+
+import os
+import shutil
 
 # User points browser to debk app, finds the site's home page
 # which claims to provide 'Double Entry Book Keeping' infrastructure.
 
 print('running {}'.format(FILE_NAME))
 
-TEST_DATA_DIRECTORY = 'data/test-data'
-# Assume dir 'data' already exists but 'test-data' does not.
-
-import os
-import shutil
+cwd = os.getcwd()
+temp_dir_name = os.path.join(cwd, "data.d")
+original_dir_name = D["home"]
 
 class FirstVisitTest(LiveServerTestCase):
     
     def setUp(self):
-        os.makedirs(TEST_DATA_DIRECTORY)
+        os.rename(original_dir_name, temp_dir_name)
+        os.mkdir(original_dir_name)
+        file_name = os.path.join(original_dir_name, D['last_entity'])
+        with open(file_name, 'w') as f_obj:
+            f_obj.write('')
+        shutil.copy(
+            os.path.join(temp_dir_name, D['cofa_template']),
+            D['home'])
         self.browser = webdriver.Chrome()
         # self.browser.implicitly_wait(3)
 
     def tearDown(self):
-        shutil.rmtree(TEST_DATA_DIRECTORY)
+        shutil.rmtree(original_dir_name)
+        os.rename(temp_dir_name, original_dir_name)
         self.browser.quit()
 
     def check_for_row_in_list_of_entities(self, row_text):
@@ -42,7 +51,7 @@ class FirstVisitTest(LiveServerTestCase):
 #       self.assertTrue(2 + 2 == 5)
 
     def test_data_dir_exists(self):
-        os.path.isdir(TEST_DATA_DIRECTORY)
+        os.path.isdir(D['home'])
 
     def test_check_django_serving_our_site(self):
         self.browser.get('http://localhost:8000')
