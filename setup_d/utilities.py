@@ -16,7 +16,7 @@ def restore_virgin_data_directory():
     """
     try:
         shutil.rmtree(D["home"])
-    except osError:
+    except OSError:
         print("Directory '{}' wasn't there to delete."
             .format(D["home"]))
     os.mkdir(D["home"])

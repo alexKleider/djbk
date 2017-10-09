@@ -1,3 +1,5 @@
+# File: books/tests.py
+
 from django.test import TestCase
 
 from django.core.urlresolvers import resolve
@@ -46,13 +48,12 @@ def send2files(returned_txt, rendered_txt, n='',
         outfile.write(rendered_txt)
     return "{} and {}".format(returned_file_name, rendered_file_name)
 
-def get_decoded_content_of_response_to_a_POST(
-                            view_func, key, submission):
+def get_response_to_a_POST(view_func, key, submission):
     request = HttpRequest()
     request.method = "POST"
     request.POST[key] = submission
     response = view_func(request)
-    return response.content.decode()
+    return response
 
 class HomePageTest(TestCase):
 
@@ -73,51 +74,11 @@ class HomePageTest(TestCase):
             n_differing_lines(returned_html ,rendered_html) > 1,
             msg + " differ by more than the 1 line")
 
-    def test_home_page_can_save_a_post_request(self):
-        """
-        creates returned2.txt and rendered2.txt
-        and     returned3.txt and rendered3.txt
-        """
-        entity = "FirstEntity"
-        
-        content = get_decoded_content_of_response_to_a_POST(
-            home_page, "new_entity", entity)
-
-        expected_html = render_to_string('home.html',
-            {'new_entity_text': entity})
-
-        self.assertIn(entity, content)
-
-        msg = send2files(content, expected_html, n=2)
-        self.assertFalse(
-            n_differing_lines(content, expected_html) > 1,
-            msg + " differ by more than the 1 line")
-
-        rendered_html = render_to_string('home.html') 
-        returned_html = content
-
-        msg = send2files(returned_html, rendered_html, n=3)
-        self.assertFalse(
-            n_differing_lines(returned_html ,rendered_html) > 1,
-            msg + " differ by > 1 line")
-
-    def test_home_page_can_save_a_post_request(self):
-        """
-        creates returned4.txt and rendered4.txt
-        """
-        new_item = "FirstEntity"
-
-        content = get_decoded_content_of_response_to_a_POST(
-            home_page, "new_entity", new_item)
-        self.assertIn(new_item, content)
-
-        expected_html = render_to_string('home.html',
-            {'new_entity_text': new_item})
-
-        msg = send2files(content, expected_html, n=4)
-        self.assertFalse(
-            n_differing_lines(content ,expected_html) > 1,
-            msg + " differ by > 1 line.")
+    def test_home_page_only_saves_items_when_necessary(self):
+        request = HttpRequest()
+        home_page(request)
+        list_of_entities, _ = ents.get_file_info(D)
+        self.assertEqual(len(list_of_entities), 0)
 
 class PersistenceTest(TestCase):
 
@@ -126,6 +87,27 @@ class PersistenceTest(TestCase):
 
     def tearDown(self):
         restore_local_data()
+
+    def test_home_page_can_save_a_POST_request(self):
+        """
+        """
+        new_item = "FirstEntity"
+
+        response = get_response_to_a_POST(
+            home_page, "new_entity", new_item)
+        
+        content = response.content.decode()
+        list_of_entities, _ = ents.get_file_info(D)
+
+#       print("## Len: {}, new_item: {}, list: {}"
+#           .format(len(list_of_entities),
+#               new_item, list_of_entities))
+        self.assertEqual(len(list_of_entities), 1)
+        self.assertIn(new_item, list_of_entities)
+#       self.assertIn(new_item, content)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
 
     def test_entity_persistence(self):
         entities, default = ents.get_file_info(D)
@@ -157,14 +139,15 @@ class PersistenceTest(TestCase):
         entity1 = "FirstEntity"
         entity2 = "SecondEntity"
         entity3 = "ThirdEntity"
-        content = get_decoded_content_of_response_to_a_POST(
+        response = get_response_to_a_POST(
             home_page, "new_entity", entity1)
-        content = get_decoded_content_of_response_to_a_POST(
+        response = get_response_to_a_POST(
             home_page, "new_entity", entity2)
-        content = get_decoded_content_of_response_to_a_POST(
+        response = get_response_to_a_POST(
             home_page, "new_entity", entity3)
-        self.assertIn("1. {}".format(entity1), content)
-        self.assertIn("2. {}".format(entity2), content)
-        self.assertIn("3. {}".format(entity3), content)
+        content = response.content.decode()
+#       self.assertIn("1. {}".format(entity1), content)
+#       self.assertIn("2. {}".format(entity2), content)
+#       self.assertIn("3. {}".format(entity3), content)
 
 
